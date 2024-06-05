@@ -1,0 +1,95 @@
+<div class="content-container">
+  <app-filter-modal (newFilterAdded)="loadFilters()"></app-filter-modal>
+  <div class="filter-cont">
+    <div class="filter-list-container" *ngFor="let filter of filters; let i = index">
+      <div class="filter-name">
+        <label>{{ filter.name }}</label>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="editSelectedFilter(filter)">Edit</button>
+        <button type="button" class="btn btn-outline-danger btn-sm" (click)="deleteFilter(filter.id)">Delete</button>
+      </div>
+      <div style="text-align: start" *ngFor="let criteria of filter.criteria; let j = index">
+        <input type="radio" id="criteria{{i}}{{j}}" name="criteria" value="{{criteria}}"
+               (click)="applyFilter(criteria)" [checked]="isChecked">
+        <label for="criteria{{i}}{{j}}">{{criteria.type}} {{criteria.comparisonType}} {{criteria.value}}</label>
+      </div>
+    </div>
+  </div>
+
+  <input type="button" class="btn btn-outline-info" value="Reset Filters" (click)="resetFilter()">
+
+
+  <app-values class="table-content" [reset]="resetEvent" [selectedCriteria]="filterApplied | async "></app-values>
+
+  <ng-template #editCriteriaModal let-modal>
+    <div class="modal-header">
+      <h4>Edit Filter</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <form #edit="ngForm">
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label" for="editName">Name:</label>
+          <div class="col-sm-3">
+            <input class="form-control" type="text" id="editName" name="editName" [(ngModel)]="editFilter.name"
+                   required>
+          </div>
+        </div>
+
+        <div style="padding-top: 10px;" class="form-group row"
+             *ngFor="let criteria of editFilter.criteria; let i = index">
+          <label class="col-sm-2 col-form-label">Criteria:</label>
+          <div class="col-sm-3">
+            <select class="form-control" id="editCriteriaType{{i}}" name="editCriteriaType{{i}}"
+                    [(ngModel)]="editFilter.criteria[i].type"
+                    required>
+              <option *ngFor="let type of criteriaTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+          <div class="col-sm-3">
+            <select class="form-control" id="editComparisonType{{i}}" name="editComparisonType{{i}}"
+                    [(ngModel)]="editFilter.criteria[i].comparisonType" required>
+              <ng-container *ngIf="editFilter.criteria[i].type === 'AMOUNT'">
+                <option *ngFor="let type of ['MORE_THAN', 'LESS_THAN', 'EQUAL_TO']" [value]="type">{{ type }}</option>
+              </ng-container>
+              <ng-container *ngIf="editFilter.criteria[i].type === 'TITLE'">
+                <option *ngFor="let type of ['STARTS_WITH', 'ENDS_WITH', 'CONTAINS']"
+                        [value]="type">{{ type }}</option>
+              </ng-container>
+              <ng-container *ngIf="editFilter.criteria[i].type === 'DATE'">
+                <option *ngFor="let type of ['FROM', 'TO']" [value]="type">{{ type }}</option>
+              </ng-container>
+            </select>
+          </div>
+          <div class="col-sm-3">
+            <ng-container *ngIf="editFilter.criteria[i].type === 'AMOUNT'">
+              <input class="form-control" type="number" id="editValue{{i}}" name="editValue{{i}}"
+                     [(ngModel)]="editFilter.criteria[i].value"
+                     required>
+            </ng-container>
+            <ng-container *ngIf="editFilter.criteria[i].type === 'TITLE'">
+              <input class="form-control" type="text" id="editValue{{i}}" name="editValue{{i}}"
+                     [(ngModel)]="editFilter.criteria[i].value"
+                     required>
+            </ng-container>
+            <ng-container *ngIf="editFilter.criteria[i].type === 'DATE'">
+              <input class="form-control" type="date" id="editValue{{i}}" name="editValue{{i}}"
+                     [(ngModel)]="editFilter.criteria[i].value"
+                     required>
+            </ng-container>
+          </div>
+          <div class="col-sm-1">
+            <button class="btn btn-danger" type="button" (click)="deleteCriteriaFromEdit(i)">-</button>
+          </div>
+        </div>
+        <div style="text-align: center; padding-top: 10px">
+          <button type="button" class="btn btn-secondary btn-sm" (click)="addCriteriaToEditFilter()">Add Row</button>
+        </div>
+      </form>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger" (click)="modal.close('Close click')">Close</button>
+      <button type="submit" class="btn btn-success" [disabled]="!edit.form.valid" (click)="updateFilter()">Save</button>
+    </div>
+  </ng-template>
+</div>

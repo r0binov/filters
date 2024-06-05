@@ -1,0 +1,20 @@
+<table class="table-content">
+  <thead>
+  <tr style="text-align: center">
+    <th>Amount</th>
+    <th>Date</th>
+    <th>Title</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr style="text-align: center" *ngFor="let value of filteredValues$ | async">
+    <td>{{ value.amount }}</td>
+    <td>{{ formatDate(value.date) }}</td>
+    <td>{{ value.title }}</td>
+    <td>
+      <button class="btn btn-danger btn-sm" (click)="deleteValue(value.id)">-</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

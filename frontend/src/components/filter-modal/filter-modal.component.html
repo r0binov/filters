@@ -1,0 +1,72 @@
+<ng-template #addCriteria let-modal>
+  <div class="modal-header">
+    <h4>Add Filter</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form #criteriaForm="ngForm">
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label" for="name">Name:</label>
+        <div class="col-sm-3">
+          <input class="form-control" type="text" id="name" name="name" [(ngModel)]="newFilter.name" required>
+        </div>
+      </div>
+      <div style="padding-top: 10px;" class="form-group row"
+           *ngFor="let criteria of newFilter.criteria; let i = index">
+        <label class="col-sm-2 col-form-label" for="criteriaType{{i}}">Criteria</label>
+        <div class="col-sm-3">
+          <select class="form-control" id="criteriaType{{i}}" name="criteriaType{{i}}"
+                  [(ngModel)]="newFilter.criteria[i].type" required>
+            <option *ngFor="let type of criteriaTypes" [value]="type">{{ type }}</option>
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <select class="form-control" id="comparisonType{{i}}" name="comparisonType{{i}}"
+                  [(ngModel)]="newFilter.criteria[i].comparisonType"
+                  required>
+            <ng-container *ngIf="newFilter.criteria[i].type === 'AMOUNT'">
+              <option *ngFor="let type of ['MORE_THAN', 'LESS_THAN', 'EQUAL_TO']" [value]="type">{{ type }}</option>
+            </ng-container>
+            <ng-container *ngIf="newFilter.criteria[i].type === 'TITLE'">
+              <option *ngFor="let type of ['STARTS_WITH', 'ENDS_WITH', 'CONTAINS']" [value]="type">{{ type }}</option>
+            </ng-container>
+            <ng-container *ngIf="newFilter.criteria[i].type === 'DATE'">
+              <option *ngFor="let type of ['FROM', 'TO']" [value]="type">{{ type }}</option>
+            </ng-container>
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <ng-container *ngIf="newFilter.criteria[i].type === 'AMOUNT'">
+            <input class="form-control" type="number" id="value{{i}}" name="value{{i}}"
+                   [(ngModel)]="newFilter.criteria[i].value" required>
+          </ng-container>
+          <ng-container *ngIf="newFilter.criteria[i].type === 'TITLE'">
+            <input class="form-control" type="text" id="value{{i}}" name="value{{i}}"
+                   [(ngModel)]="newFilter.criteria[i].value" required>
+          </ng-container>
+          <ng-container *ngIf="newFilter.criteria[i].type === 'DATE'">
+            <input class="form-control" type="date" id="value{{i}}" name="value{{i}}"
+                   [(ngModel)]="newFilter.criteria[i].value" required>
+          </ng-container>
+        </div>
+        <div class="col-sm-1">
+          <button type="button" class="btn btn-danger" (click)="deleteCriteriaFromAdd(i)">-</button>
+        </div>
+      </div>
+      <div style="text-align: center; padding-top: 10px">
+        <button type="button" class="btn btn-secondary btn-sm"
+                (click)="addCriteriaRowForPost()">Add Row
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Close click')">Close</button>
+    <button type="submit" class="btn btn-success" [disabled]="!criteriaForm.form.valid" (click)="createNewFilter()">
+      Save
+    </button>
+  </div>
+</ng-template>
+
+<button type="button" class="btn btn-primary" (click)="openAddModal(addCriteria)">Add Filter</button>
